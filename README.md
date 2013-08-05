@@ -84,7 +84,7 @@ The returned `Employee` has the following methods, which are chainable:
 - #####`begin`(`data`)
 	The `begin` method tells the `Employee` *Thread* to start running. The `data` can be of any type and will be passed through to the first `parameter` of the `task` you have defined.
 	
-	You cannot `begin` a `Employee` *Thread* if you have not defined it's `task`.
+	You cannot `begin` an `Employee` *Thread* if you have not defined it's `task`.
 
 	#####Example
 
@@ -95,7 +95,7 @@ The returned `Employee` has the following methods, which are chainable:
 	    	.begin('Begin your task!');
 
 - #####`stop`()
-	This method will `stop` a `Employee` *Thread*.
+	This method will `stop` an `Employee` *Thread*.
 	
 	#####Example
 
@@ -103,7 +103,7 @@ The returned `Employee` has the following methods, which are chainable:
 	    	.stop(); // will stop the Employee Thread with reference: 'monkey'
 
 - #####`destroy`()
-	This method will `stop` a `Employee` *Thread* and `destroy` the `Employee`.
+	This method will `stop` an `Employee` *Thread* and `destroy` the `Employee`.
 	
 	#####Example
 

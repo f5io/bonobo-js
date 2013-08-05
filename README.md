@@ -49,16 +49,16 @@ The returned `Employee` has the following methods, which are chainable:
 	The `Function` can contain methods from `Bonobo`'s *`Employee` Thread* API.
 	
 	#####Example
-    Bonobo('monkey')
-    	.task(function(data) {
-    		Bonobo.log('Received: ' + data); // can also use console.log
-    		// This computationally expensive code will run on a new thread
-    		var arr = [];
-			for (var i = 0, n=1, a=1; i < 16750000; i++, a+=4, n++) {
-				arr.push(i * a / n);
-			}
-			Bonobo.done('I\'ve finished my task!');
-    	});
+        Bonobo('monkey')
+    	    .task(function(data) {
+    		    Bonobo.log('Received: ' + data); // can also use console.log
+    		    // This computationally expensive code will run on a new thread
+    		    var arr = [];
+			    for (var i = 0, n=1, a=1; i < 16750000; i++, a+=4, n++) {
+				    arr.push(i * a / n);
+			    }
+			    Bonobo.done('I\'ve finished my task!');
+    	    });
 
 - #####`done`(`fn /* Function */`)
 	The `Function` passed into the `done` method will be executed when the *`Employee` Thread* calls its own `done` method. The first `parameter` of the `Function` will be what the *`Employee` Thread* passed through.

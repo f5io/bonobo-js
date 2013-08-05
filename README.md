@@ -71,6 +71,7 @@ The returned `Employee` has the following methods, which are chainable:
        		console.log('Response from Bonobo(\'' + this.ref + '\'): ' + data);
        	});
 
+
 - #####`error`(`fn /* Function */`)
 	The `Function` passed into the `error` method will be executed when the *`Employee` Thread* calls its own `error` method OR when an error occurs. The first `parameter` of the `Function` will be what the *`Employee` Thread* passed through OR the error message.
 	

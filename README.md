@@ -137,7 +137,7 @@ The returned `Employee` has the following methods, which are chainable:
 				for (var i = 0, n=1, a=1; i < 16750000; i++, a+=4, n++) {
 					arr.push(i * a / n);
 				}
-				Bonobo.done('I\'ve finished my task!');
+				Bonobo.done({ message: 'I\'ve finished my task!', data: arr });
 	    	});
 
 

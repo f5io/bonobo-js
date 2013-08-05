@@ -48,8 +48,7 @@ The returned `Employee` has the following methods, which are chainable:
 	
 	The `Function` can contain methods from `Bonobo`'s *`Employee` Thread* API.
 	
-	Example
-	-------
+	#####Example
     Bonobo('monkey')
     	.task(function(data) {
     		Bonobo.log('Received: ' + data); // can also use console.log

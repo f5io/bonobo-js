@@ -46,7 +46,7 @@ The returned `Employee` has the following methods, which are chainable:
 - #####`task`(`fn /* Function */`)
 	The `Function` passed into the `task` method will be executed on a new `thread`. The first `parameter` of the `Function` will be passed by the `begin` method.
 	
-	The `Function` can contain methods from `Bonobo`'s _`Employee` Thread_ API.
+	The `Function` can contain methods from `Bonobo`'s `Employee` *Thread* API.
 	
 	#####Example
         Bonobo('monkey')
@@ -61,7 +61,7 @@ The returned `Employee` has the following methods, which are chainable:
     	    });
 
 - #####`done`(`fn /* Function */`)
-	The `Function` passed into the `done` method will be executed when the _`Employee` Thread_ calls its own `done` method. The first `parameter` of the `Function` will be what the _`Employee` Thread_ passed through.
+	The `Function` passed into the `done` method will be executed when the `Employee` *Thread* calls its own `done` method. The first `parameter` of the `Function` will be what the `Employee` *Thread* passed through.
 	
 	#####Example
 
@@ -72,7 +72,7 @@ The returned `Employee` has the following methods, which are chainable:
 
 
 - #####`error`(`fn /* Function */`)
-	The `Function` passed into the `error` method will be executed when the _`Employee` Thread_ calls its own `error` method OR when an error occurs. The first `parameter` of the `Function` will be what the _`Employee` Thread_ passed through OR the error message.
+	The `Function` passed into the `error` method will be executed when the `Employee` *Thread* calls its own `error` method OR when an error occurs. The first `parameter` of the `Function` will be what the `Employee` *Thread* passed through OR the error message.
 	
 	#####Example
 
@@ -82,9 +82,9 @@ The returned `Employee` has the following methods, which are chainable:
 	       	});
 
 - #####`begin`(`data`)
-	The `begin` method tells the _`Employee` Thread_ to start running. The `data` can be of any type and will be passed through to the first `parameter` of the `task` you have defined.
+	The `begin` method tells the `Employee` *Thread* to start running. The `data` can be of any type and will be passed through to the first `parameter` of the `task` you have defined.
 	
-	You cannot `begin` a _`Employee` Thread_ if you have not defined it's `task`.
+	You cannot `begin` a `Employee` *Thread* if you have not defined it's `task`.
 
 	#####Example
 
@@ -95,7 +95,7 @@ The returned `Employee` has the following methods, which are chainable:
 	    	.begin('Begin your task!');
 
 - #####`stop`()
-	This method will `stop` a _`Employee` Thread_.
+	This method will `stop` a `Employee` *Thread*.
 	
 	#####Example
 
@@ -103,7 +103,7 @@ The returned `Employee` has the following methods, which are chainable:
 	    	.stop(); // will stop the Employee Thread with reference: 'monkey'
 
 - #####`destroy`()
-	This method will `stop` a _`Employee` Thread_ and `destroy` the `Employee`.
+	This method will `stop` a `Employee` *Thread* and `destroy` the `Employee`.
 	
 	#####Example
 
@@ -115,7 +115,7 @@ The returned `Employee` has the following methods, which are chainable:
 ###`Employee` Thread
 ---
 - #####`Bonobo`.`log`(`data`) OR `console`.`log`(`data`)
-	This method will `log` to the `console` of the *Main Thread*. `console`.`log` in the _`Employee` Thread_ is aliased to `Bonobo`.`log` for ease-of-use.
+	This method will `log` to the `console` of the *Main Thread*. `console`.`log` in the `Employee` *Thread* is aliased to `Bonobo`.`log` for ease-of-use.
 
 	#####Example
 
@@ -156,7 +156,7 @@ The returned `Employee` has the following methods, which are chainable:
 	    	});
 
 - #####`Bonobo`.`stop`()
-	This method will stop the _`Employee` Thread_ from within itself.
+	This method will stop the `Employee` *Thread* from within itself.
 	
 	#####Example
 

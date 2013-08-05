@@ -1,0 +1,13 @@
+{
+  "name": "bonobo",
+  "version": "1.0.0",
+  "main": [
+    "lib/bonobo.js"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "components"
+  ],
+  "dependencies": {}
+}

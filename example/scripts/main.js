@@ -16,7 +16,7 @@
 
 		Bonobo('monkey')
 			.task(function(msg) {
-				Bonobo.log(JSON.stringify(msg));
+				console.log(msg);
 				var arr = [];
 				for (var i = 0, n=1, a=1; i < 16750000; i++, a+=4, n++) {
 					arr.push(i * a / n);

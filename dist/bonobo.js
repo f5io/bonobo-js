@@ -132,7 +132,6 @@
 				if (_.support) {
 					this.worker.postMessage(d);
 				} else {
-					console.log(this.worker().toString());
 					try {
 						var t = this;
 						t.to = setTimeout(function() {

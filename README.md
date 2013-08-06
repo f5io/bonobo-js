@@ -1,6 +1,6 @@
 #Bonobo
 
-##A lightweight (~1kb gzipped) wrapper for the HTML5 Web Worker API.
+##A lightweight (~1.2kb gzipped) wrapper for the HTML5 Web Worker API.
 
 **Author:** *Joe Harlow* (<joe@f5.io>)
 
@@ -12,7 +12,9 @@
 ###Browser Support
 ---
 
-`Bonobo` is built on the `Worker` and `Blob` APIs. Therefore it is only supported by modern browsers.
+`Bonobo` is built on the `Worker` and `Blob` APIs. When these are not available it will purely run the `task` in the main thread by creating a fake `worker`. This should allow the usage of `Bonobo` in a *Progressive Enhancement* environment.
+
+For full capabilities, the following browsers are supported:
 
 - Microsoft Internet Explorer 10+
 - Mozilla Firefox 21.0+

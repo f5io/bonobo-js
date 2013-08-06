@@ -16,7 +16,7 @@
 
 		Bonobo('monkey')
 			.task(function(msg) {
-				console.log(msg);
+				Bonobo.log(JSON.stringify(msg));
 				var arr = [];
 				for (var i = 0, n=1, a=1; i < 16750000; i++, a+=4, n++) {
 					arr.push(i * a / n);
@@ -30,7 +30,7 @@
 				console.log('Response from Bonobo(\'' + this.ref + '\'): ' + msg);
 				this.destroy();
 			})
-			.begin({msg:'Start your task!'});
+			.begin('Start your task!');
 	};
 
 })();

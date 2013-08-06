@@ -10,30 +10,40 @@
 		return typeof s.document === 'undefined';
 	})();
 
-	_.noop = function(e) {};
+	_.support = true;
+
+	_.noop = function() {};
 
 	if (!_.impt) {
 		var d = document, w = window;
-		if (!('Worker' in w) && !('Blob' in w)) throw '[Bonobo] Your browser is not supported.';
+
+		_.support = (function() {
+			return 'Worker' in w && 'Blob' in w && ('webkitURL' in w || 'URL' in w);
+		})();
+
 		_bN = function(ref) {
 			if (typeof ref === 'undefined') throw '[Bonobo] Your employee needs a reference.';
 			return (ref in _emp) ? _emp[ref] : new Employee(ref);
 		};
-		_.src = (function() {
-			var scripts = d.getElementsByTagName('script'),
-				href = d.location.href,
-				loc = href.substr(0, href.lastIndexOf('/')).split('/'),
-				url, count;
-			for (var i = 0; i < scripts.length; i++) {
-				if (scripts[i].getAttribute('src').indexOf('bonobo') !== -1) {
-					url = scripts[i].getAttribute('src');
+
+		if (_.support) {
+			_.url = w.URL || w.webkitURL;
+			_.src = (function() {
+				var scripts = d.getElementsByTagName('script'),
+					href = d.location.href,
+					loc = href.substr(0, href.lastIndexOf('/')).split('/'),
+					url, count;
+				for (var i = 0; i < scripts.length; i++) {
+					if (scripts[i].getAttribute('src').indexOf('bonobo') !== -1) {
+						url = scripts[i].getAttribute('src');
+					}
 				}
-			}
-			count = url.match(/\.\.\//g);
-			return loc.slice(0, -(count.length)).join('/') + '/' + url.split('../').join('');
-		})();
-		_.url = 'webkitURL' in w ? w.webkitURL : 'URL' in w ? w.URL : undefined;
-		if (typeof _.url === 'undefined') throw '[Bonobo] Your browser is not supported.';
+				count = url.match(/\.\.\//g);
+				return loc.slice(0, -(count.length)).join('/') + '/' + url.split('../').join('');
+			})();
+		} else {
+			console.warn('[Bonobo] Web Workers are not supported, using a shim, however it will not be truly multi-threaded.');
+		}
 	} else {
 		_bN = {
 			done : function(d) {
@@ -45,7 +55,7 @@
 			error : function(d) {
 				s.postMessage({method: 'error', userData: d});
 			},
-			stop : function(d) {
+			stop : function() {
 				s.close();
 			}
 		};
@@ -56,6 +66,8 @@
 		t.ref = ref;
 		t.blob = undefined;
 		t.worker = undefined;
+		t.to = undefined;
+		t.fallback = _.noop;
 		t.doneHandler = _.noop;
 		t.errorHandler = _.noop;
 		t.messageHandler = function(e) {
@@ -77,24 +89,60 @@
 
 	Employee.prototype = {
 		task : function(fn) {
-			this.blob = new Blob([
-				[
-					'importScripts(\'' + _.src + '\');',
-					'console = { log : Bonobo.log };',
-					'onmessage = function(e) {',
-						'(' + fn.toString() + ').apply(self,[e.data]);',
-					'}'
-				].join('')
-			], {'type' : 'text/javascript' });
-			this.blobURL = _.url.createObjectURL(this.blob);
-			this.worker = new Worker(this.blobURL);
-			this.worker.onmessage = this.messageHandler;
-			this.worker.onerror = this.messageHandler;
+			if (_.support) {
+				this.blob = new Blob([
+					[
+						'importScripts(\'' + _.src + '\');',
+						'console = { log : Bonobo.log };',
+						'onmessage = function(e) {',
+							'(' + fn.toString() + ').apply(self,[e.data]);',
+						'}'
+					].join('')
+				], {'type' : 'text/javascript' });
+				this.blobURL = _.url.createObjectURL(this.blob);
+				this.worker = new Worker(this.blobURL);
+				this.worker.onmessage = this.messageHandler;
+				this.worker.onerror = this.messageHandler;
+			} else {
+				var t = this;
+				t.fallback = fn;
+				t.to = undefined;
+				t.fn = {
+					done : function(d) {
+						t.doneHandler.call(t, d);
+					},
+					log : function(d) {
+						console.log('[Bonobo(\''+t.ref+'\') : LOG]: ' + d);
+					},
+					error : function(d) {
+						t.errorHandler.call(t, d);
+					},
+					stop : function() {
+						if (typeof t.to !== 'undefined') clearTimeout(this.to);
+					}
+				};
+				t.worker = (function() {
+					return new Function('return ' + t.fallback.toString().replace(/Bonobo/g, 'this.fn')
+																		.replace(/bN/g, 'this.fn')
+																		.replace(/console/g, 'this.fn'));
+				})();
+			}
 			return this;
 		},
 		begin : function(d) {
 			if (typeof this.worker !== 'undefined') {
-				this.worker.postMessage(d);
+				if (_.support) {
+					this.worker.postMessage(d);
+				} else {
+					try {
+						var t = this;
+						t.to = setTimeout(function() {
+							t.worker().call(t, d);
+						}, 10);
+					} catch (e) {
+						this.errorHandler.call(this, e.message);
+					}
+				}
 				return this;
 			} else {
 				throw '[Bonobo] This employee has not been tasked with anything!';
@@ -109,14 +157,22 @@
 			return this;
 		},
 		stop : function() {
-			this.worker.terminate();
+			if (_.support) {
+				this.worker.terminate();
+			} else {
+				if (typeof this.to !== 'undefined') clearTimeout(this.to);
+			}
 			return this;
 		},
 		destroy : function() {
 			this.blob = undefined;
-			this.worker.terminate();
+			if (_.support) {
+				this.worker.terminate();
+				_.url.revokeObjectURL(this.blobURL);
+			} else {
+				if (typeof this.to !== 'undefined') clearTimeout(this.to);
+			}
 			this.worker = undefined;
-			_.url.revokeObjectURL(this.blobURL);
 			delete _emp[this.ref];
 		}
 	};

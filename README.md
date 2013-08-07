@@ -1,6 +1,6 @@
 #Bonobo
 
-##A lightweight (~1.2kb gzipped) wrapper for the HTML5 Web Worker API.
+##A lightweight (~1.9kb gzipped) wrapper for the HTML5 Web Worker API.
 
 **Author:** *Joe Harlow* (<joe@f5.io>)
 
@@ -12,7 +12,7 @@
 ###Browser Support
 ---
 
-`Bonobo` is built on the `Worker` and `Blob` APIs. When these are not available it will purely run the `task` in the main thread by creating a fake `worker`. This should allow the usage of `Bonobo` in a *Progressive Enhancement* environment.
+`Bonobo` is built on the `Web Worker` and `Blob` APIs. When these are not available it will purely run the `task` in the main thread by creating a fake `worker`. This should allow the usage of `Bonobo` in a *Progressive Enhancement* environment.
 
 For full capabilities, the following browsers are supported:
 
@@ -155,6 +155,18 @@ The returned `Employee` has the following methods, which are chainable:
 	    		} else {
 	    			Bonobo.done('I\'ve finished my task!');
 	    		}
+	    	});
+
+- #####`Bonobo`.`importJS`(`...args`)
+	This method is an `alias` for the `importScripts` function that is available within the `Web Worker` API.
+	
+	#####Example
+
+	    Bonobo('monkey')
+	    	.task(function(data) {
+	    		Bonobo.importJS('scripts/something.js','scripts/awesome.js');
+	    		Bonobo.log(JSON.stringify(Something));
+	    		Bonobo.log(JSON.stringify(Awesome));
 	    	});
 
 - #####`Bonobo`.`stop`()

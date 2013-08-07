@@ -16,6 +16,9 @@
 
 		Bonobo('monkey')
 			.task(function(msg) {
+				Bonobo.importJS('scripts/modules/something.js','scripts/modules/awesome.js');
+				console.log(JSON.stringify(Something));
+				console.log(JSON.stringify(Awesome));
 				console.log(msg);
 				var arr = [];
 				for (var i = 0, n=1, a=1; i < 16750000; i++, a+=4, n++) {

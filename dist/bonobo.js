@@ -139,6 +139,9 @@
 			done : function(d) {
 				s.postMessage({method: 'response', userData: d});
 			},
+			emit : function(ev, d) {
+				s.postMessage({method: ev, userData: d});
+			},
 			log : function(d) {
 				s.postMessage({method: 'log', userData: d});
 			},
@@ -163,9 +166,12 @@
 		t.fallback = _.noop;
 		t.doneHandler = _.noop;
 		t.errorHandler = _.noop;
+		t.userHandlers = {};
 		t.messageHandler = function(e) {
 			if (e.type === 'error') {
 				t.errorHandler.call(t, e.message);
+			} else if (t.userHandlers.hasOwnProperty(e.data.method)) {
+				t.userHandlers[e.data.method].call(t, e.data.userData);
 			} else {
 				switch (e.data.method) {
 					case 'log':
@@ -205,6 +211,9 @@
 				t.fn = {
 					done : function(d) {
 						t.doneHandler.call(t, d);
+					},
+					emit : function(ev, d) {
+						if (t.userHandlers.hasOwnProperty(ev)) t.userHandlers[ev].call(t, d);
 					},
 					log : function(d) {
 						console.log('[Bonobo(\''+t.ref+'\') : LOG]: ', d);
@@ -255,6 +264,10 @@
 		},
 		error : function(fn) {
 			this.errorHandler = fn;
+			return this;
+		},
+		on : function(ev, fn) {
+			this.userHandlers[ev] = fn;
 			return this;
 		},
 		stop : function() {

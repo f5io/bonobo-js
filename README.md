@@ -72,6 +72,19 @@ The returned `Employee` has the following methods, which are chainable:
 	       		console.log('Response from Bonobo(\'' + this.ref + '\'): ' + data);
 	       	});
 
+- #####`on`(`event /* String */`, `fn /* Function */`)
+	The `on` method allows `Bonobo` to listen out for custom events emitted from the `Employee` *Thread* using the `emit` method.
+	
+	#####Example
+
+	    Bonobo('monkey')
+	    	.task(function(data) {
+	        	Bonobo.emit('refresh', 'Hello World!');
+	    	})
+	    	.on('refresh', function(data) {
+	       		console.log('Data from Bonobo(\'' + this.ref + '\'): ' + data);
+	       	});
+
 
 - #####`error`(`fn /* Function */`)
 	The `Function` passed into the `error` method will be executed when the `Employee` *Thread* calls its own `error` method OR when an error occurs. The first `parameter` of the `Function` will be what the `Employee` *Thread* passed through OR the error message.
@@ -141,6 +154,19 @@ The returned `Employee` has the following methods, which are chainable:
 				}
 				Bonobo.done({ message: 'I\'ve finished my task!', data: arr });
 	    	});
+
+- #####`Bonobo`.`emit`(`event /* String */`,`data`)
+	This method will push the `data` provided to the *Main Thread* through the handler defined for the `event` name using the `on` method.
+	
+	#####Example
+
+	    Bonobo('monkey')
+	    	.task(function(data) {
+	        	Bonobo.emit('refresh', 'Hello World!');
+	    	})
+	    	.on('refresh', function(data) {
+	       		console.log('Data from Bonobo(\'' + this.ref + '\'): ' + data);
+	       	});
 
 
 - #####`Bonobo`.`error`(`message`)

@@ -1,0 +1,7 @@
+#!/bin/sh
+
+cp -rf lib/bonobo.js dist/bonobo.js
+uglifyjs dist/bonobo.js -o dist/bonobo.min.js
+gzip -c dist/bonobo.min.js | wc -c
+
+echo '[Bonobo] Build complete.'

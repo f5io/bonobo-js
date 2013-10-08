@@ -169,7 +169,7 @@
 			} else {
 				switch (e.data.method) {
 					case 'log':
-						console.log('[Bonobo(\''+t.ref+'\') : LOG]: ' + e.data.userData);
+						console.log('[Bonobo(\''+t.ref+'\') : LOG]: ', e.data.userData);
 					break;
 					case 'response':
 						t.doneHandler.call(t, e.data.userData);
@@ -207,7 +207,7 @@
 						t.doneHandler.call(t, d);
 					},
 					log : function(d) {
-						console.log('[Bonobo(\''+t.ref+'\') : LOG]: ' + d);
+						console.log('[Bonobo(\''+t.ref+'\') : LOG]: ', d);
 					},
 					error : function(d) {
 						t.errorHandler.call(t, d);

@@ -88,7 +88,7 @@ The returned `Employee` has the following methods, which are chainable:
 	    Bonobo('monkey')
 		    .require('scripts/script1.js', 'scripts/script2.js');
 
-- #####`define`(`fn /* Named Function */` |OR| `name /* String */`, `fn /* Function */`)
+- #####`define`(`fn /* Named Function */` OR `name /* String */`, `fn /* Function */`)
 	The `define` method takes either a *Named* `Function` **or** a `name` and `Function` combination. It allows you to define a function within your worker which can be called at a later time.
 	
 	This method will also expose the `Function` as a named variable of the `Employee` object if it is not already taken or reserved. It will also expose the function via the `run` method documented below.

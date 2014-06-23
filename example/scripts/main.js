@@ -45,7 +45,6 @@
 				});
 
 				Bonobo.emit('event', llresults);
-				//Bonobo.done(obj);
 			})
 			.on('event', function(data) {
 				console.log(data);
@@ -55,7 +54,6 @@
 			})
 			.done(function(msg) {
 				console.log('Response from Bonobo(\'' + this.ref + '\'): ', msg);
-				//this.destroy();
 			})
 			.compile().then(function() {
 				this.calculate(transferringObj);

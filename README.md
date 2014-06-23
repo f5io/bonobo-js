@@ -1,6 +1,6 @@
-#Bonobo
+#Bonobo (v2.0)
 
-##A lightweight (~1.9kb gzipped) wrapper for the HTML5 Web Worker API.
+##A lightweight wrapper for the HTML5 Web Worker API.
 
 **Author:** *Joe Harlow* (<joe@f5.io>)
 
@@ -8,6 +8,11 @@
 `Bonobo` provides a simple wrapper for the HTML5 Web Worker API. It is library agnostic and has no dependencies.
 
 `Bonobo` allows you to define `workers` inline, negating the need for seperate JavaScript files.
+
+###Version 2.0
+---
+
+`Bonobo v2.0` adds a completely revised set of methods. Please make sure to read the docs if you wish to start using `v2.0`.
 
 ###Browser Support
 ---
@@ -32,9 +37,20 @@ For full capabilities, the following browsers are supported:
 ###Usage
 ---
 
-`Bonobo` can be accessed using either `Bonobo` or `bN`. From here on out, we will refer to it as `Bonobo`.
+`Bonobo` can be loaded via `AMD` using `browserify`.
+
+    var Bonobo = require('{path to bonobo.js}');
+
+If loaded with a `<script>` tag, `Bonobo` can be accessed using either `Bonobo` or `bN` on the `window` object.
+
+From here on out, we will refer to it as `Bonobo`.
 
 `Bonobo` has two sets of methods. One relates to methods available in your `main` JavaScript file/thread, the other relates to methods available from within your `worker`.
+
+###Transferable Objects
+---
+
+`Bonobo` has built in systems to deal with Transferable Objects intelligently. If the content being transferred between threads can be automatically converted into an `ArrayBuffer` then it will be transferred as such. This allows for transferring of large `Strings`, `Objects` or `Arrays` to happen quickly and efficiently. **Please be aware:** This will not allow you to transfer `prototype` chains or `Function`s between threads, plain objects only.
 
 ###Main Thread
 ---
@@ -45,27 +61,71 @@ Calling `Bonobo('monkey')` creates and returns a new `Employee` with a reference
 
 The returned `Employee` has the following methods, which are chainable:
 
-- #####`task`(`fn /* Function */`)
-	The `Function` passed into the `task` method will be executed on a new `thread`. The first `parameter` of the `Function` will be passed by the `begin` method.
+- #####`hoist`(`fn /* Function */`)
+	As of `Bonobo v2.0`, employees can have multiple defined functions which are reusable. The contents of the `Function` passed to `hoist` will be hoisted to the top of you worker, allowing you to define reused variables or functions globally across the `Employee`.
+
+	_Example_:
 	
-	The `Function` can contain methods from `Bonobo`'s `Employee` *Thread* API.
-	
-	#####Example
-        Bonobo('monkey')
-    	    .task(function(data) {
-    		    Bonobo.log('Received: ' + data); // can also use console.log
-    		    // This computationally expensive code will run on a new thread
-    		    var arr = [];
-			    for (var i = 0, n=1, a=1; i < 16750000; i++, a+=4, n++) {
-				    arr.push(i * a / n);
+	    Bonobo('monkey')
+	        .hoist(function() {
+			    var MAX_NUMBER = 123456,
+			    	MIN_NUMBER = 1;
+
+			    function double(num) {
+				    return num * 2;
 			    }
-			    Bonobo.done('I\'ve finished my task!');
-    	    });
+
+			    var triple = function(num) {
+				    return num * 3;
+			    }
+	        });
+
+- #####`require`(`...args /* String */`)
+	This method is an `alias` for the `importScripts` function that is available within the `Web Worker` API. It will import the supplied scripts at the top of your worker.
+	
+	_Example_:
+	
+	    Bonobo('monkey')
+		    .require('scripts/script1.js', 'scripts/script2.js');
+
+- #####`define`(`fn /* Named Function */` |OR| `name /* String */`, `fn /* Function */`)
+	The `define` method takes either a *Named* `Function` **or** a `name` and `Function` combination. It allows you to define a function within your worker which can be called at a later time.
+	
+	This method will also expose the `Function` as a named variable of the `Employee` object if it is not already taken or reserved. It will also expose the function via the `run` method documented below.
+	
+	_Example_:
+	
+	    Bonobo('monkey')
+	        .define(function calculate(data) {
+	            /* Will expose the function 'calculate' on the Employee.
+	             * For example, after compilation you will be able to run
+	             * Bonobo('monkey').calculate(data); */
+	        });
+	    
+	    // The following code achieves the same result
+	    
+	    Bonobo('monkey')
+	        .define('calculate', function(data) {
+	        	/* Exposes the function 'calculate' on the Employee.
+	        });
+	
+- #####`run`(`method /* String */`[, `data`[, `transfer /* ArrayBuffer */`]])
+	The `run` method will call the requested `method` on the the `Employee` *Thread* only once the worker has been **compiled**. As above, `data` that can be transferred as an `ArrayBuffer` will automatically be done so.
+	
+	_Example_:
+	
+	    Bonobo('monkey')
+	    	.define(function calculate(data) {
+	    		// Do something here.
+	    	})
+	    	.compile().then(function() {
+	    		this.run('calculate', data);
+	    	});
 
 - #####`done`(`fn /* Function */`)
 	The `Function` passed into the `done` method will be executed when the `Employee` *Thread* calls its own `done` method. The first `parameter` of the `Function` will be what the `Employee` *Thread* passed through.
 	
-	#####Example
+	_Example_:
 
 	    Bonobo('monkey')
 	    	.done(function(data) {
@@ -75,10 +135,10 @@ The returned `Employee` has the following methods, which are chainable:
 - #####`on`(`event /* String */`, `fn /* Function */`)
 	The `on` method allows `Bonobo` to listen out for custom events emitted from the `Employee` *Thread* using the `emit` method.
 	
-	#####Example
+	_Example_:
 
 	    Bonobo('monkey')
-	    	.task(function(data) {
+	    	.define(function refresh(data) {
 	        	Bonobo.emit('refresh', 'Hello World!');
 	    	})
 	    	.on('refresh', function(data) {
@@ -89,30 +149,32 @@ The returned `Employee` has the following methods, which are chainable:
 - #####`error`(`fn /* Function */`)
 	The `Function` passed into the `error` method will be executed when the `Employee` *Thread* calls its own `error` method OR when an error occurs. The first `parameter` of the `Function` will be what the `Employee` *Thread* passed through OR the error message.
 	
-	#####Example
+	_Example_:
 
 	    Bonobo('monkey')
 	    	.error(function(message) {
 	       		console.log('Error from Bonobo(\'' + this.ref + '\'): ' + message);
 	       	});
 
-- #####`begin`(`data`)
-	The `begin` method tells the `Employee` *Thread* to start running. The `data` can be of any type and will be passed through to the first `parameter` of the `task` you have defined.
+- #####`build`() **OR** `compile`()
+	Before using an 'Employee' *Thread*, it must be compiled. The `compile` or `build` methods return a simple `Promise` object containing a `then` Function.
 	
-	You cannot `begin` an `Employee` *Thread* if you have not defined it's `task`.
-
-	#####Example
-
+	You cannot run any of the defined methods on a worker until it is compiled.
+	
+	_Example_:
+	
 	    Bonobo('monkey')
-	    	.task(function(data) {
-	    		console.log(data); // will log '[Bonobo('monkey') : LOG] : Begin your task!'
+	    	.define(function calculate(data) {
+	    		// Do something here.
 	    	})
-	    	.begin('Begin your task!');
+	    	.compile().then(function() {
+	    		this.run('calculate', data);
+	    	});
 
 - #####`stop`()
 	This method will `stop` an `Employee` *Thread*.
 	
-	#####Example
+	_Example_:
 
 	    Bonobo('monkey')
 	    	.stop(); // will stop the Employee Thread with reference: 'monkey'
@@ -120,7 +182,7 @@ The returned `Employee` has the following methods, which are chainable:
 - #####`destroy`()
 	This method will `stop` an `Employee` *Thread* and `destroy` the `Employee`.
 	
-	#####Example
+	_Example_:
 
 	    Bonobo('monkey')
 	    	.destroy(); // will stop the Employee Thread with reference: 'monkey' and destroy it
@@ -132,10 +194,10 @@ The returned `Employee` has the following methods, which are chainable:
 - #####`Bonobo`.`log`(`data`) OR `console`.`log`(`data`)
 	This method will `log` to the `console` of the *Main Thread*. `console`.`log` in the `Employee` *Thread* is aliased to `Bonobo`.`log` for ease-of-use.
 
-	#####Example
+	_Example_:
 
 	    Bonobo('monkey')
-	    	.task(function(data) {
+	    	.define(function logs(data) {
 	    		Bonobo.log('Hello'); // will log 'Hello' to the Main Thread
 	    		console.log('World!'); // will log 'World!' to the Main Thread
 	       	});
@@ -143,10 +205,10 @@ The returned `Employee` has the following methods, which are chainable:
 - #####`Bonobo`.`done`(`data`)
 	This method will push the `data` provided to the *Main Thread*.
 	
-	#####Example
+	_Example_:
 
 	    Bonobo('monkey')
-	    	.task(function(data) {
+	    	.define(function compute(data) {
 	    		// This computationally expensive code will run on a new thread
 	    		var arr = [];
 				for (var i = 0, n=1, a=1; i < 16750000; i++, a+=4, n++) {
@@ -158,10 +220,10 @@ The returned `Employee` has the following methods, which are chainable:
 - #####`Bonobo`.`emit`(`event /* String */`,`data`)
 	This method will push the `data` provided to the *Main Thread* through the handler defined for the `event` name using the `on` method.
 	
-	#####Example
+	_Example_:
 
 	    Bonobo('monkey')
-	    	.task(function(data) {
+	    	.define(function refresh(data) {
 	        	Bonobo.emit('refresh', 'Hello World!');
 	    	})
 	    	.on('refresh', function(data) {
@@ -172,10 +234,10 @@ The returned `Employee` has the following methods, which are chainable:
 - #####`Bonobo`.`error`(`message`)
 	This method will force an error with the value of `message` to the *Main Thread*.
 	
-	#####Example
+	_Example_:
 
 	    Bonobo('monkey')
-	    	.task(function(data) {
+	    	.define(function helloWorld(data) {
 	    		if (data !== 'Hello World') {
 	    			Bonobo.error('Wrong data!');
 	    		} else {
@@ -186,10 +248,10 @@ The returned `Employee` has the following methods, which are chainable:
 - #####`Bonobo`.`importJS`(`...args`)
 	This method is an `alias` for the `importScripts` function that is available within the `Web Worker` API.
 	
-	#####Example
+	_Example_:
 
 	    Bonobo('monkey')
-	    	.task(function(data) {
+	    	.define(function calc(data) {
 	    		Bonobo.importJS('scripts/something.js','scripts/awesome.js');
 	    		Bonobo.log(JSON.stringify(Something));
 	    		Bonobo.log(JSON.stringify(Awesome));
@@ -198,10 +260,10 @@ The returned `Employee` has the following methods, which are chainable:
 - #####`Bonobo`.`stop`()
 	This method will stop the `Employee` *Thread* from within itself.
 	
-	#####Example
+	_Example_:
 
 	    Bonobo('monkey')
-	    	.task(function(data) {
+	    	.define(function calc(data) {
 	    		if (data !== 'Hello World') {
 	    			Bonobo.stop();
 	    		}

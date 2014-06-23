@@ -9,6 +9,17 @@
         <title>Bonobo.js</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
+        <style>
+            img {
+                -webkit-animation:spin 2s linear infinite;
+                -moz-animation:spin 2s linear infinite;
+                animation:spin 2s linear infinite;
+            }
+
+            @-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
+            @-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
+            @keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
+        </style>
     </head>
     <body>
         <div class="container">
@@ -41,7 +52,6 @@
         </div>
 
         <script type="text/javascript" src="../lib/bonobo.js"></script>
-        <script type="text/javascript" src="scripts/jquery.min.js"></script>
         <script type="text/javascript" src="scripts/main.js"></script>
     </body>
 </html>

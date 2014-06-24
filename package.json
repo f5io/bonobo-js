@@ -1,0 +1,21 @@
+{
+  "name": "bonobo",
+  "version": "2.0.1",
+  "description": "A work-monkey to do your dirty business.",
+  "main": "lib/bonobo.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/f5io/bonobo-js.git"
+  },
+  "keywords": [
+    "web",
+    "workers",
+    "bonobo"
+  ],
+  "author": "Joe Harlow",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/f5io/bonobo-js/issues"
+  },
+  "homepage": "https://github.com/f5io/bonobo-js"
+}

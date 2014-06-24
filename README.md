@@ -30,16 +30,16 @@ For full capabilities, the following browsers are supported:
 ###Installation
 ---
 
-`Bonobo` can be installed with `bower`, by running:
+`Bonobo` can be installed with either `npm` or `bower`, by running:
 
-`bower install bonobo`
+`npm install bonobo` or `bower install bonobo` respectively.
 
 ###Usage
 ---
 
-`Bonobo` can be loaded via `AMD` using `browserify`.
+`Bonobo` can be loaded via `AMD` using `browserify`, if the package has been installed via `npm`.
 
-    var Bonobo = require('{path to bonobo.js}');
+    var Bonobo = require('bonobo');
 
 If loaded with a `<script>` tag, `Bonobo` can be accessed using either `Bonobo` or `bN` on the `window` object.
 

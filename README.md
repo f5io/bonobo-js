@@ -268,6 +268,11 @@ The returned `Employee` has the following methods, which are chainable:
 	    			Bonobo.stop();
 	    		}
 	    	});
+
+###Other Contributors
+---
+
+[hanthomas](http://github.com/hanthomas)
 	
 ###License
 ---

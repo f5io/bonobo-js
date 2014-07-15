@@ -37,7 +37,7 @@ For full capabilities, the following browsers are supported:
 ###Usage
 ---
 
-`Bonobo` can be loaded via `AMD` using `browserify`, if the package has been installed via `npm`.
+`Bonobo` can be loaded using `CommonJS`-style module definitions using `browserify`, if the package has been installed via `npm`.
 
     var Bonobo = require('bonobo');
 

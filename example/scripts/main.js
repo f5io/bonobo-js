@@ -41,12 +41,14 @@
 				obj = data;
 
 				var llresults = obj.map(function(num) {
-					return lucasLehmer(num);
+					var result = lucasLehmer(num);
+					Bonobo.emit('result', result);
+					return result;
 				});
 
-				Bonobo.emit('event', llresults);
+				Bonobo.done(llresults);
 			})
-			.on('event', function(data) {
+			.on('result', function(data) {
 				console.log(data);
 			})
 			.error(function(msg) {

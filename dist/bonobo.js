@@ -14,6 +14,8 @@
         _bonobo, Employee, Promise,
         _employees = {};
 
+    var slice = Array.prototype.slice;
+
     _.isDefined = function(o) {
         return typeof o !== 'undefined';
     };
@@ -25,8 +27,6 @@
     _.isSupported = true;
 
     _.noOp = function() {};
-    
-    _.slice = Array.prototype.slice;
     
     _.buildArgs = function(method, data, transfer) {
         var args = [{ method: method, userData: data }];
@@ -70,138 +70,102 @@
         return str.match(/function (\w*)/)[1];
     };
 
-    if (!_.isImported) {
-        var d = document, w = window;
+    var d = document, w = window;
 
-        _bonobo = function(ref) {
-            if (typeof ref === 'undefined') throw '[Bonobo] Your employee needs a reference.';
-            return (ref in _employees) ? _employees[ref] : new Employee(ref);
-        };
+    _bonobo = function(ref) {
+        if (typeof ref === 'undefined') throw '[Bonobo] Your employee needs a reference.';
+        return (ref in _employees) ? _employees[ref] : new Employee(ref);
+    };
 
-        _.isSupported = (function() {
-            return 'Worker' in w &&
-                'Blob' in w &&
-                ('webkitURL' in w || 'URL' in w) &&
-                !!(function() {
-                    try {
-                        _.blobURL = w.URL || w.webkitURL;
-                        var test = _.blobURL.createObjectURL(new Blob([';'], { type: 'text/javascript' }));
-                        var wrk = new Worker(test);
-                        wrk.terminate();
-                        _.blobURL.revokeObjectURL(test);
-                        return true;
-                    } catch (e) {
-                        return false;
-                    }
-                })();
-        })();
-
-        if (_.isSupported) {
-            _.location = (function() {
-                function cleanPathName() {
-                    var path = d.location.pathname.replace(/(\b\/.+)\.(?:html?|php|do)/g, '/');
-                    path = path.slice(-1) === '/' ? path : path + '/';
-                    return path;
-                }
-
-                return d.location.protocol + '//' + d.location.hostname + (d.location.port ? ':' + d.location.port : '') + cleanPathName();
-            })();
-            
-            _.bonoboSrc = (function() {
-                var scripts = d.getElementsByTagName('script'), url;
-                for (var i = 0; i < scripts.length; i++) {
-                    if (scripts[i].getAttribute('src').indexOf('bonobo') !== -1) {
-                        url = scripts[i].getAttribute('src');
-                    }
-                }
-                return _.location + url;
-            })();
-        } else {
-            _.removeScripts = function(ref) {
-                var el = d.querySelectorAll('[rel='+ref+']');
-                for (var i = 0; i < el.length; i++) {
-                    el[i].parentNode.removeChild(el[i]);
-                }
-            };
-
-            _.loadScripts = function() {
-                var _this = this;
-                var args = _.slice.call(arguments);
-                var _prm = new Promise().bind(_this);
-
-                function source(src) {
-                    var scripts = d.getElementsByTagName('script');
-                    for (var i = 0; i < scripts.length; i++) {
-                        var s = scripts[i];
-                        if (s.getAttribute('src') === 'src') {
-                            return true;
-                        }
-                    }
+    _.isSupported = (function() {
+        return 'Worker' in w &&
+            'Blob' in w &&
+            ('webkitURL' in w || 'URL' in w) &&
+            !!(function() {
+                try {
+                    _.blobURL = w.URL || w.webkitURL;
+                    var test = _.blobURL.createObjectURL(new Blob([';'], { type: 'text/javascript' }));
+                    var wrk = new Worker(test);
+                    wrk.terminate();
+                    _.blobURL.revokeObjectURL(test);
+                    return true;
+                } catch (e) {
                     return false;
                 }
+            })();
+    })();
 
-                function script(s) {
-                    var _promise = new Promise();
-                    var src = s;
-                    if (source(s.src)) {
-                        setTimeout(_promise.resolve, 0);
-                        return _promise;
-                    }
-                    var p = d.getElementsByTagName('script')[0];
-                    var f = d.createElement('script');
-                    var done = false;
-                    f.async = true;
-                    f.src = src  + '?' + Math.floor(Math.random() * new Date().getTime());
-                    f.onload = f.onreadystatechange = function() {
-                        if ( !done && (!this.readyState || this.readyState == 'loaded' || this.readyState == 'complete') )
-                        {
-                            done = true;
-                            setTimeout(_promise.resolve, 0);
-                            f.onload = f.onreadystatechange = null;
-                        }
-                    };
-                    p.parentNode.insertBefore(f, p);
-                    f.setAttribute('rel', _this.ref);
-                    return _promise;
-                }
+    if (_.isSupported) {
+        _.location = (function() {
+            function cleanPathName() {
+                var path = d.location.pathname.replace(/\/(?:.(?!\/))+\.(html?|php|do)$/g, '');
+                path = path.slice(-1) === '/' ? path : path + '/';
+                return path;
+            }
 
-                function loop() {
-                    if (args.length) {
-                        script(args.shift()).then(loop);
-                    } else {
-                        _prm.resolve();
-                    }
-                }
-
-                loop();
-
-                return _prm;
-            };
-        }
+            return d.location.protocol + '//' + d.location.hostname + (d.location.port ? ':' + d.location.port : '') + cleanPathName();
+        })();
     } else {
-        _bonobo = {
-            done : function(data, transfer) {
-                s.postMessage.apply(s, _.buildArgs('response', data, transfer));
-            },
-            emit : function(ev, data, transfer) {
-                s.postMessage.apply(s, _.buildArgs(ev, data, transfer));
-            },
-            log : function() {
-                s.postMessage.apply(s, _.buildArgs('log', _.slice.call(arguments)));
-            },
-            error : function() {
-                s.postMessage.apply(s, _.buildArgs('error', _.slice.call(arguments)));
-            },
-            importJS : function() {
-                s.importScripts.apply(s, _.slice.call(arguments).map(function(scr) {
-                    return scr.indexOf('http') > -1 ? scr : scr.slice(0, 1) === '/' ? _location + scr.slice(1) : _location + scr;
-                }));
-            },
-            stop : function() {
-                s.close();
+        _.removeScripts = function(ref) {
+            var el = d.querySelectorAll('[rel='+ref+']');
+            for (var i = 0; i < el.length; i++) {
+                el[i].parentNode.removeChild(el[i]);
             }
         };
-        s._ = _;
+
+        _.loadScripts = function() {
+            var _this = this;
+            var args = slice.call(arguments);
+            var _prm = new Promise().bind(_this);
+
+            function source(src) {
+                var scripts = d.getElementsByTagName('script');
+                for (var i = 0; i < scripts.length; i++) {
+                    var s = scripts[i];
+                    if (s.getAttribute('src') === 'src') {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            function script(s) {
+                var _promise = new Promise();
+                var src = s;
+                if (source(s.src)) {
+                    setTimeout(_promise.resolve, 0);
+                    return _promise;
+                }
+                var p = d.getElementsByTagName('script')[0];
+                var f = d.createElement('script');
+                var done = false;
+                f.async = true;
+                f.src = src  + '?' + Math.floor(Math.random() * new Date().getTime());
+                f.onload = f.onreadystatechange = function() {
+                    if ( !done && (!this.readyState || this.readyState == 'loaded' || this.readyState == 'complete') )
+                    {
+                        done = true;
+                        setTimeout(_promise.resolve, 0);
+                        f.onload = f.onreadystatechange = null;
+                    }
+                };
+                p.parentNode.insertBefore(f, p);
+                f.setAttribute('rel', _this.ref);
+                return _promise;
+            }
+
+            function loop() {
+                if (args.length) {
+                    script(args.shift()).then(loop);
+                } else {
+                    _prm.resolve();
+                }
+            }
+
+            loop();
+
+            return _prm;
+        };
     }
 
     Promise = function() {
@@ -226,7 +190,7 @@
     Employee = function(ref) {
         var _self = this;
         _self.ref = ref;
-        _self.scripts = [_.bonoboSrc];
+        _self.scripts = [];
         _self.methods = {};
         _self.scope = '';
         _self.blob = undefined;
@@ -277,7 +241,7 @@
             return this;
         },
         require : function() {
-            var args = _.slice.call(arguments);
+            var args = slice.call(arguments);
             if (_.isSupported) {
                 this.scripts = this.scripts.concat(args.map(function(scr) {
                     return scr.indexOf('http') > -1 ? scr : scr.slice(0, 1) === '/' ? _.location + scr.slice(1) : _.location + scr;
@@ -344,12 +308,49 @@
             delete _employees[this.ref];
         },
         build : function() {
+            var workerFn = {
+                done : function(data, transfer) {
+                    self.postMessage.apply(self, _.buildArgs('response', data, transfer));
+                },
+                emit : function(ev, data, transfer) {
+                    self.postMessage.apply(self, _.buildArgs(ev, data, transfer));
+                },
+                log : function() {
+                    self.postMessage.apply(self, _.buildArgs('log', slice.call(arguments)));
+                },
+                error : function() {
+                    self.postMessage.apply(self, _.buildArgs('error', slice.call(arguments)));
+                },
+                importJS : function() {
+                    self.importScripts.apply(self, slice.call(arguments).map(function(scr) {
+                        return scr.indexOf('http') > -1 ? scr : scr.slice(0, 1) === '/' ? _.location + scr.slice(1) : _.location + scr;
+                    }));
+                },
+                stop : function() {
+                    self.close();
+                }
+            };
             var build, _promise = new Promise().bind(this);
             if (_.isSupported) {
                 build = [
-                    'importScripts(\'' + this.scripts.join('\',\'') + '\');',
-                    'console = { log : Bonobo.log };',
-                    'var _location = \'' + _.location + '\';',
+                    this.scripts.length ? 'importScripts(\'' + this.scripts.join('\',\'') + '\');' : '',
+                    'var slice = Array.prototype.slice;',
+                    'var _ = {',
+                    [
+                        'buildArgs',
+                        'arrayBufferToString',
+                        'stringToArrayBuffer',
+                        'getConstructorName'
+                    ].map(function(fn) {
+                        return fn + ': ' + _[fn].toString() + ',';
+                    }).join('\n').slice(0, -1),
+                    '};',
+                    'var Bonobo = {',
+                    Object.keys(workerFn).map(function(fn) {
+                        return fn + ': ' + workerFn[fn].toString() + ',';
+                    }).join('\n').slice(0, -1),
+                    '};',
+                    'var console = { log : Bonobo.log };',
                     this.scope,
                     'onmessage = function(e) {',
                         'var data = e.data.userData;',
@@ -364,19 +365,17 @@
                                     'break;',
                             '}',
                         '}',
-                        'switch(e.data.method) {'
-                ];
-                for (var m in this.methods) {
-                    build.push(
-                            'case \'' + m + '\':',
-                                '(' + this.methods[m].toString().replace(/importScripts/g, 'Bonobo.importJS') + ').apply(self,[data]);',
-                            'break;'
-                    );
-                }
-                build.push(
+                        'switch(e.data.method) {',
+                        Object.keys(this.methods).map(function(fn) {
+                            return [
+                                'case \'' + fn + '\':',
+                                    '(' + this.methods[fn].toString().replace(/importScripts/g, 'Bonobo.importJS') + ').apply(self,[data]);',
+                                'break;'
+                            ].join('\n');
+                        }, this).join('\n'),
                         '}',
                     '}'
-                );
+                ];
                 this.blob = new Blob([ build.join('\n') ], { type : 'text/javascript' });
                 this.blobURL = _.blobURL.createObjectURL(this.blob);
                 this.worker = new Worker(this.blobURL);
@@ -393,13 +392,13 @@
                         if (_self.userHandlers.hasOwnProperty(ev)) _self.userHandlers[ev].call(_self, data);
                     },
                     log : function() {
-                        Function.prototype.apply.call(s.console.log, s.console, ['[Bonobo(\''+_self.ref+'\') : LOG]:'].concat(_.slice.call(arguments)));
+                        Function.prototype.apply.call(s.console.log, s.console, ['[Bonobo(\''+_self.ref+'\') : LOG]:'].concat(slice.call(arguments)));
                     },
                     error : function(data) {
                         _self.errorHandler.call(_self, data);
                     },
                     importJS: function() {
-                        return _.loadScripts.apply(_self, _.slice.call(arguments));
+                        return _.loadScripts.apply(_self, slice.call(arguments));
                     },
                     stop : function() {
                         _self.stop();

@@ -157,7 +157,7 @@ The returned `Employee` has the following methods, which are chainable:
 	       	});
 
 - #####`build`() **OR** `compile`()
-	Before using an 'Employee' *Thread*, it must be compiled. The `compile` or `build` methods return a simple `Promise` object containing a `then` Function.
+	Before using an 'Employee' *Thread*, it must be compiled. The `compile` or `build` methods return a simple `Promise`-like object containing a `then` Function.
 	
 	You cannot run any of the defined methods on a worker until it is compiled.
 	

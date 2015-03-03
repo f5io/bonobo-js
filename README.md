@@ -1,6 +1,6 @@
-#Bonobo (v2.1)
+# Bonobo (v2.1)
 
-##A lightweight wrapper for the HTML5 Web Worker API.
+## A lightweight wrapper for the HTML5 Web Worker API.
 
 **Author:** *Joe Harlow* (<joe@f5.io>)
 
@@ -9,12 +9,12 @@
 
 `Bonobo` allows you to define `workers` inline, negating the need for seperate JavaScript files.
 
-###Version 2.0+
+### Version 2.0+
 ---
 
 `Bonobo v2.0+` adds a completely revised set of methods. Please make sure to read the docs if you wish to start using `v2.0+`.
 
-###Browser Support
+### Browser Support
 ---
 
 `Bonobo` is built on the `Web Worker` and `Blob` APIs. When these are not available it will purely run the `task` in the main thread by creating a fake `worker`. This should allow the usage of `Bonobo` in a *Progressive Enhancement* environment.
@@ -27,14 +27,14 @@ For full capabilities, the following browsers are supported:
 - Apple Safari 5.1+
 - Opera 15.0+
 
-###Installation
+### Installation
 ---
 
 `Bonobo` can be installed with either `npm` or `bower`, by running:
 
 `npm install bonobo` or `bower install bonobo` respectively.
 
-###Usage
+### Usage
 ---
 
 `Bonobo` can be loaded using `CommonJS`-style module definitions using `browserify`, if the package has been installed via `npm`.
@@ -47,21 +47,21 @@ From here on out, we will refer to it as `Bonobo`.
 
 `Bonobo` has two sets of methods. One relates to methods available in your `main` JavaScript file/thread, the other relates to methods available from within your `worker`.
 
-###Transferable Objects
+### Transferable Objects
 ---
 
 `Bonobo` has built in systems to deal with Transferable Objects intelligently. If the content being transferred between threads can be automatically converted into an `ArrayBuffer` then it will be transferred as such. This allows for transferring of large `Strings`, `Objects` or `Arrays` to happen quickly and efficiently. **Please be aware:** This will not allow you to transfer `prototype` chains or `Function`s between threads, plain objects only.
 
-###Main Thread
+### Main Thread
 ---
 
-####`Bonobo`(`reference /* String */`)
+#### `Bonobo`(`reference /* String */`)
 
 Calling `Bonobo('monkey')` creates and returns a new `Employee` with a reference of `'monkey'`. The created `Employee` can be retrieved at any time using the same method.
 
 The returned `Employee` has the following methods, which are chainable:
 
-- #####`hoist`(`fn /* Function */`)
+- ##### `hoist`(`fn /* Function */`)
 	As of `Bonobo v2.0`, employees can have multiple defined functions which are reusable. The contents of the `Function` passed to `hoist` will be hoisted to the top of you worker, allowing you to define reused variables or functions globally across the `Employee`.
 
 	_Example_:
@@ -80,7 +80,7 @@ The returned `Employee` has the following methods, which are chainable:
 			    }
 	        });
 
-- #####`require`(`...args /* String */`)
+- ##### `require`(`...args /* String */`)
 	This method is an `alias` for the `importScripts` function that is available within the `Web Worker` API. It will import the supplied scripts at the top of your worker.
 	
 	_Example_:
@@ -88,7 +88,7 @@ The returned `Employee` has the following methods, which are chainable:
 	    Bonobo('monkey')
 		    .require('scripts/script1.js', 'scripts/script2.js');
 
-- #####`define`(`fn /* Named Function */` OR `name /* String */`, `fn /* Function */`)
+- ##### `define`(`fn /* Named Function */` OR `name /* String */`, `fn /* Function */`)
 	The `define` method takes either a *Named* `Function` **or** a `name` and `Function` combination. It allows you to define a function within your worker which can be called at a later time.
 	
 	This method will also expose the `Function` as a named variable of the `Employee` object if it is not already taken or reserved. It will also expose the function via the `run` method documented below.
@@ -109,7 +109,7 @@ The returned `Employee` has the following methods, which are chainable:
 	        	/* Exposes the function 'calculate' on the Employee.
 	        });
 	
-- #####`run`(`method /* String */`[, `data`[, `transfer /* ArrayBuffer */`]])
+- ##### `run`(`method /* String */`[, `data`[, `transfer /* ArrayBuffer */`]])
 	The `run` method will call the requested `method` on the the `Employee` *Thread* only once the worker has been **compiled**. As above, `data` that can be transferred as an `ArrayBuffer` will automatically be done so.
 	
 	_Example_:
@@ -122,7 +122,7 @@ The returned `Employee` has the following methods, which are chainable:
 	    		this.run('calculate', data);
 	    	});
 
-- #####`done`(`fn /* Function */`)
+- ##### `done`(`fn /* Function */`)
 	The `Function` passed into the `done` method will be executed when the `Employee` *Thread* calls its own `done` method. The first `parameter` of the `Function` will be what the `Employee` *Thread* passed through.
 	
 	_Example_:
@@ -132,7 +132,7 @@ The returned `Employee` has the following methods, which are chainable:
 	       		console.log('Response from Bonobo(\'' + this.ref + '\'): ' + data);
 	       	});
 
-- #####`on`(`event /* String */`, `fn /* Function */`)
+- ##### `on`(`event /* String */`, `fn /* Function */`)
 	The `on` method allows `Bonobo` to listen out for custom events emitted from the `Employee` *Thread* using the `emit` method.
 	
 	_Example_:
@@ -146,7 +146,7 @@ The returned `Employee` has the following methods, which are chainable:
 	       	});
 
 
-- #####`error`(`fn /* Function */`)
+- ##### `error`(`fn /* Function */`)
 	The `Function` passed into the `error` method will be executed when the `Employee` *Thread* calls its own `error` method OR when an error occurs. The first `parameter` of the `Function` will be what the `Employee` *Thread* passed through OR the error message.
 	
 	_Example_:
@@ -156,7 +156,7 @@ The returned `Employee` has the following methods, which are chainable:
 	       		console.log('Error from Bonobo(\'' + this.ref + '\'): ' + message);
 	       	});
 
-- #####`build`() **OR** `compile`()
+- ##### `build`() **OR** `compile`()
 	Before using an 'Employee' *Thread*, it must be compiled. The `compile` or `build` methods return a simple `Promise`-like object containing a `then` Function.
 	
 	You cannot run any of the defined methods on a worker until it is compiled.
@@ -171,7 +171,7 @@ The returned `Employee` has the following methods, which are chainable:
 	    		this.run('calculate', data);
 	    	});
 
-- #####`stop`()
+- ##### `stop`()
 	This method will `stop` an `Employee` *Thread*.
 	
 	_Example_:
@@ -179,7 +179,7 @@ The returned `Employee` has the following methods, which are chainable:
 	    Bonobo('monkey')
 	    	.stop(); // will stop the Employee Thread with reference: 'monkey'
 
-- #####`destroy`()
+- ##### `destroy`()
 	This method will `stop` an `Employee` *Thread* and `destroy` the `Employee`.
 	
 	_Example_:
@@ -189,7 +189,7 @@ The returned `Employee` has the following methods, which are chainable:
 
 
 
-###`Employee` Thread
+### `Employee` Thread
 ---
 - #####`Bonobo`.`log`(`data`) OR `console`.`log`(`data`)
 	This method will `log` to the `console` of the *Main Thread*. `console`.`log` in the `Employee` *Thread* is aliased to `Bonobo`.`log` for ease-of-use.
@@ -202,7 +202,7 @@ The returned `Employee` has the following methods, which are chainable:
 	    		console.log('World!'); // will log 'World!' to the Main Thread
 	       	});
 	
-- #####`Bonobo`.`done`(`data`)
+- ##### `Bonobo`.`done`(`data`)
 	This method will push the `data` provided to the *Main Thread*.
 	
 	_Example_:
@@ -217,7 +217,7 @@ The returned `Employee` has the following methods, which are chainable:
 				Bonobo.done({ message: 'I\'ve finished my task!', data: arr });
 	    	});
 
-- #####`Bonobo`.`emit`(`event /* String */`,`data`)
+- ##### `Bonobo`.`emit`(`event /* String */`,`data`)
 	This method will push the `data` provided to the *Main Thread* through the handler defined for the `event` name using the `on` method.
 	
 	_Example_:
@@ -231,7 +231,7 @@ The returned `Employee` has the following methods, which are chainable:
 	       	});
 
 
-- #####`Bonobo`.`error`(`message`)
+- ##### `Bonobo`.`error`(`message`)
 	This method will force an error with the value of `message` to the *Main Thread*.
 	
 	_Example_:
@@ -245,7 +245,7 @@ The returned `Employee` has the following methods, which are chainable:
 	    		}
 	    	});
 
-- #####`Bonobo`.`importJS`(`...args`)
+- ##### `Bonobo`.`importJS`(`...args`)
 	This method is an `alias` for the `importScripts` function that is available within the `Web Worker` API.
 	
 	_Example_:
@@ -257,7 +257,7 @@ The returned `Employee` has the following methods, which are chainable:
 	    		Bonobo.log(JSON.stringify(Awesome));
 	    	});
 
-- #####`Bonobo`.`stop`()
+- ##### `Bonobo`.`stop`()
 	This method will stop the `Employee` *Thread* from within itself.
 	
 	_Example_:
@@ -269,7 +269,7 @@ The returned `Employee` has the following methods, which are chainable:
 	    		}
 	    	});
 	
-###License
+### License
 ---
 
 Copyright (C) 2014 Joe Harlow (Fourth of 5 Limited)

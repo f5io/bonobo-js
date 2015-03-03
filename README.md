@@ -191,7 +191,7 @@ The returned `Employee` has the following methods, which are chainable:
 
 ### `Employee` Thread
 ---
-- #####`Bonobo`.`log`(`data`) OR `console`.`log`(`data`)
+- ##### `Bonobo`.`log`(`data`) OR `console`.`log`(`data`)
 	This method will `log` to the `console` of the *Main Thread*. `console`.`log` in the `Employee` *Thread* is aliased to `Bonobo`.`log` for ease-of-use.
 
 	_Example_:

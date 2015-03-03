@@ -1,6 +1,6 @@
 {
   "name": "bonobo",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "A work-monkey to do your dirty business.",
   "main": "lib/bonobo.js",
   "repository": {

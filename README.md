@@ -1,4 +1,4 @@
-#Bonobo (v2.0)
+#Bonobo (v2.1)
 
 ##A lightweight wrapper for the HTML5 Web Worker API.
 
@@ -9,10 +9,10 @@
 
 `Bonobo` allows you to define `workers` inline, negating the need for seperate JavaScript files.
 
-###Version 2.0
+###Version 2.0+
 ---
 
-`Bonobo v2.0` adds a completely revised set of methods. Please make sure to read the docs if you wish to start using `v2.0`.
+`Bonobo v2.0+` adds a completely revised set of methods. Please make sure to read the docs if you wish to start using `v2.0+`.
 
 ###Browser Support
 ---

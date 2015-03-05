@@ -1,5 +1,6 @@
 import assert from 'assert';
 import {
+	noop,
 	isDefined,
 	getConstructorName,
 	getFunctionName,
@@ -17,6 +18,14 @@ describe('Utilities', function() {
 		obj = { hello: 'world' };
 		arr = [1, 2, 3];
 		fn = function hello() { var hello; };
+	});
+
+	describe('#noop()', function() {
+
+		it('should do nothing', function() {
+			assert.equal(isDefined(noop()), false);
+		});
+
 	});
 
 	describe('#isDefined()', function() {
@@ -62,7 +71,7 @@ describe('Utilities', function() {
 	describe('#getFunctionContent()', function() {
 
 		it('should return a string of the content of the function', function() {
-			assert.equal(getFunctionContent(fn).trim(), 'var hello;');
+			assert.equal(getFunctionContent(fn), 'var hello;');
 		});
 
 	});

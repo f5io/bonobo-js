@@ -1,3 +1,5 @@
+function noop() {}
+
 function isDefined(a) {
     return typeof a !== 'undefined';
 }
@@ -11,7 +13,7 @@ function getFunctionName(fn) {
 }
 
 function getFunctionContent(fn) {
-    return fn.toString().replace(/^function\s?(?:\w+)?\(\)\s?\{(.|[\s\S]*)\}/g, (m, content) =>  content);
+    return fn.toString().replace(/^function\s?(?:\w+)?\(\)\s?\{(.|[\s\S]*)\}/g, (m, content) =>  content).trim();
 }
 
 function arrayBufferToString(buffer) {
@@ -37,6 +39,7 @@ function format(str, dict) {
 }
 
 export default {
+    noop,
     isDefined,
     getConstructorName,
     getFunctionName,

@@ -24,8 +24,8 @@ gulp.task('build', function() {
 
 gulp.task('test', function() {
     return mochify('./test/**/*.js', {
-            slow: 0,
-            reporter: 'spec', // 'spec' looks better
+            wd: true,
+            reporter: 'spec', // 'list' for durations, 'spec' looks better
             phantomjs: './node_modules/phantomjs/bin/phantomjs'
         })
         .transform(babelify)

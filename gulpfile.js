@@ -1,12 +1,11 @@
 var gulp = require('gulp'),
+    mochify = require('mochify'),
     babelify = require('babelify'),
     browserify = require('browserify'),
     source = require('vinyl-source-stream'),
-    buffer = require('vinyl-buffer'),
-    mocaccino = require('mocaccino');
+    buffer = require('vinyl-buffer');
 
-var mochify = require('mochify'),
-    through = require('through2');
+var path = require('path');
 
 gulp.task('build', function() {
     return browserify({
@@ -24,8 +23,9 @@ gulp.task('build', function() {
 });
 
 gulp.task('test', function() {
-    return mochify('./test/**.js', {
-            reporter: 'spec',
+    return mochify('./test/**/*.js', {
+            slow: 0,
+            reporter: 'spec', // 'spec' looks better
             phantomjs: './node_modules/phantomjs/bin/phantomjs'
         })
         .transform(babelify)

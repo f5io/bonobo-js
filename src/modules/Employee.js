@@ -1,5 +1,27 @@
-import { noop, isDefined, getFunctionName, getFunctionContent } from './Utilities';
-import { URL, isSupported } from './Support';
+import { 
+    noop,
+    isDefined,
+    getFunctionName,
+    getFunctionContent,
+    stringToArrayBuffer,
+    arrayBufferToString,
+    getConstructorName
+} from './Utilities';
+import { URL, isSupported, supportsStructuredClone } from './Support';
+import { buildArgsConvert, buildArgsStructuredClone } from './Message';
+
+var employeeUtilities;
+
+supportsStructuredClone().then(function(boo) {
+    employeeUtilities = boo ? {
+        buildArgs: buildArgsStructuredClone
+    } : {
+        buildArgs: buildArgsConvert,
+        stringToArrayBuffer,
+        arrayBufferToString,
+        getConstructorName
+    };
+});
 
 export default class Employee {
     constructor(ref) {
@@ -30,12 +52,12 @@ export default class Employee {
             if (method in this) throw '[Bonobo] \'' + method + '\' is reserved or already defined, please use something else.';
         }
         this.methods[method] = fn;
-        this[method] = (data, transfer) => this.run(method, data, transfer);
+        this[method] = (data) => this.run(method, data);
         return this;
     }
-    run(method, data, transfer) {
+    run(method, data) {
         if (isDefined(this.worker)) {
-            // this.worker.postMessage.apply(this.worker, ...)
+            this.worker.postMessage(...employeeUtilities.buildArgs(method, data));
         } else {
             throw '[Bonobo] Please build/compile your worker before attempting to interact with it.';
         }
@@ -53,7 +75,7 @@ export default class Employee {
         return this;
     }
     stop() {
-        if (isDefined(this.worker)) this.worker.terminate();
+        isDefined(this.worker) && this.worker.terminate();
         return this;
     }
     destroy() {

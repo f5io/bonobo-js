@@ -17,7 +17,7 @@ function getFunctionName(fn) {
 }
 
 function getFunctionContent(fn) {
-    return fn.toString().replace(/^function\s?(?:\w+)?\(\)\s?\{(.|[\s\S]*)\}/g, (m, content) =>  content).trim();
+    return fn.toString().replace(/^function\s?(?:\w+)?\(\)\s?\{(.|[\s\S]*)\}/g, (m, content) => content).trim();
 }
 
 function arrayBufferToString(buffer) {

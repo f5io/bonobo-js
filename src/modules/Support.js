@@ -1,9 +1,9 @@
 import { Ping } from './Templates';
-import { isBoolean } from './Utilities';
+import { isBoolean, isDefined } from './Utilities';
 
 var URL;
 
-var structuredClone = false;
+var structuredClone;
 
 var isSupported = (function() {
     return 'Worker' in window &&
@@ -23,18 +23,21 @@ var isSupported = (function() {
         })();
 })();
 
-(function() {
-    if (!isSupported) structuredClone = false;
-    var blob = URL.createObjectURL(new Blob([Ping], { type: 'text/javascript' }));
-    var worker = new Worker(blob);
-    worker.onmessage = function(e) {
-        structuredClone = isBoolean(e.data) ? true : false;
-        worker.terminate();
-        URL.revokeObjectURL(blob);
-    }
-    worker.postMessage(['ping']);
-})();
+var supportsStructuredClone = function() {
+    return new Promise((resolve, reject) => {
+        if (isDefined(structuredClone)) return resolve(structuredClone);
+        if (!isSupported) return resolve((structuredClone = false));
+        var blobURL = URL.createObjectURL(new Blob([Ping], { type: 'text/javascript' }));
+        var worker = new Worker(blobURL);
+        worker.onmessage = function(e) {
+            resolve((structuredClone = isBoolean(e.data)));
+            worker.terminate();
+            URL.revokeObjectURL(blobURL);
+        }
+        worker.postMessage(['ping']);
+    });
+};
 
 export default {
-	URL, isSupported
+	URL, isSupported, supportsStructuredClone
 }

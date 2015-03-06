@@ -1,27 +1,36 @@
-import { getConstructorName, stringToArrayBuffer, arrayBufferToString } from './Utilities';
+import * as _ from './Utilities';
 
-var stringify = obj => postMessage(JSON.stringify(obj));
+function buildArgsConvert(method, userData) {
+	var args = { method, userData },
+		constructor = _.getConstructorName(userData);
 
-function buildArgs(method, data) {
-	var args = { method, data },
-		constructor = getConstructorName(data);
-
-	switch (getConstructorName(data)) {
+	switch (constructor) {
 		case 'Array':
 		case 'Object':
-			args.data = stringToArrayBuffer(JSON.stringify(data));
+			args.userData = _.stringToArrayBuffer(JSON.stringify(userData));
 			args.transfer = 'JSON_AB';
 			break;
 		case 'String':
-			args.data = stringToArrayBuffer(data);
+			args.userData = _.stringToArrayBuffer(userData);
 			args.transfer = 'STRING_AB';
+			break;
+		case 'ArrayBuffer':
+			args.transfer = 'AB';
 			break;
 	}
 	var result = [args];
-	result.push([args.data]);
+	if ('transfer' in args) result.push([args.userData]);
+	return result;
+}
+
+function buildArgsStructuredClone(method, userData) {
+	var args = { method, userData };
+	var result = [args];
+	result.push([args.userData]);
 	return result;
 }
 
 export default {
-	buildArgs
+	buildArgsConvert,
+	buildArgsStructuredClone
 }

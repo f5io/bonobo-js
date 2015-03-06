@@ -1,4 +1,9 @@
+import { Ping } from './Templates';
+import { isBoolean } from './Utilities';
+
 var URL;
+
+var structuredClone = false;
 
 var isSupported = (function() {
     return 'Worker' in window &&
@@ -16,6 +21,18 @@ var isSupported = (function() {
                 return false;
             }
         })();
+})();
+
+(function() {
+    if (!isSupported) structuredClone = false;
+    var blob = URL.createObjectURL(new Blob([Ping], { type: 'text/javascript' }));
+    var worker = new Worker(blob);
+    worker.onmessage = function(e) {
+        structuredClone = isBoolean(e.data) ? true : false;
+        worker.terminate();
+        URL.revokeObjectURL(blob);
+    }
+    worker.postMessage(['ping']);
 })();
 
 export default {

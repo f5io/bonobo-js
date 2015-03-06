@@ -1,13 +1,5 @@
-import {
-    noop,
-    isDefined,
-    getFunctionName,
-    getFunctionContent
-} from './Utilities';
-import {
-    URL,
-    isSupported
-} from './Support';
+import { noop, isDefined, getFunctionName, getFunctionContent } from './Utilities';
+import { URL, isSupported } from './Support';
 
 export default class Employee {
     constructor(ref) {

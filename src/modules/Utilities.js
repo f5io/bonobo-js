@@ -4,6 +4,10 @@ function isDefined(a) {
     return typeof a !== 'undefined';
 }
 
+function isBoolean(b) {
+	return typeof b === 'boolean';
+}
+
 function getConstructorName(o) {
     return Object.prototype.toString.call(o).match(/\[object (\w*)\]/)[1];
 }
@@ -41,6 +45,7 @@ function format(str, dict) {
 export default {
     noop,
     isDefined,
+    isBoolean,
     getConstructorName,
     getFunctionName,
     getFunctionContent,

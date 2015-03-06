@@ -29,6 +29,10 @@ gulp.task('test', function() {
             phantomjs: './node_modules/phantomjs/bin/phantomjs'
         })
         .transform(babelify)
+        .on('error', function(err) {
+            console.error('Mochify failed!');
+            this.end();
+        })
         .bundle();
 });
 

@@ -18,7 +18,9 @@
 		Bonobo('monkey')
 			.require('scripts/modules/bigint.js')
 			.hoist(function() {
-				var obj;
+				return {
+					obj: null
+				};
 			})
 			.define(function calculate(data) {
 				// function lucasLehmer(p) {
